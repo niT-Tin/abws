@@ -605,8 +605,9 @@ _comp_cd() {
     [[ ${BUFFER/%"${completion_reply[0]}/"/} != "$BUFFER" ]] && return
     # 如果BUFFER已经被修改，则不需要再次修改
     BUFFER=${BUFFER%"${BASH_REMATCH[2]}"}"${completion_reply[0]}/"
-    echo-ne "${completion_reply[0]#${BASH_REMATCH[2]}}/"
-    (( CURSOR+=${#completion_reply[0]} + 1 ))
+    local ct="${completion_reply[0]#${BASH_REMATCH[2]}}"
+    echo-ne "$ct/"
+    (( CURSOR+=${#ct} + 1 ))
     return
   elif [[ ${#completion_reply[@]} -gt 1 ]]; then
     clear_pre_suggestion
