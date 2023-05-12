@@ -507,7 +507,13 @@ _comp_general() {
   local completion_reply=()
   local cmd
   local need_to_match
-  cmd=$(which "${BASH_REMATCH[1]}" 2>/dev/null)
+  local expa_alias=$(alias "${BASH_REMATCH[1]}" 2>/dev/null | sed "s/.*='\([^']*\)'/\1/")
+  if [[ ${#expa_alias} -gt 0 ]]; then 
+    cmd="${expa_alias[0]%%[[:blank:]]*}"
+  else
+    cmd="${BASH_REMATCH[1]}"
+  fi
+  cmd=$(which "$cmd" 2>/dev/null)
   [[ -n $cmd ]] && need_to_match="${BASH_REMATCH[3]}"
   [[ -z $cmd && ! -f "${BASH_REMATCH[1]}" && ! -d "${BASH_REMATCH[1]}" ]] && return
   [[ -z $cmd ]] && need_to_match="${BASH_REMATCH[1]}"
