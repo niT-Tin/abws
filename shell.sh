@@ -59,6 +59,8 @@ declare -g DEFAULT_PROMPT
 declare -ig sigint=130
 # 程序名称
 declare -g PROGRAM_NAME=abws
+# .bashrc
+declare -g SOURCE_ALIAS="$HOME/.bashrc"
 
 # 输出函数
 echo-ne() {
@@ -204,7 +206,6 @@ init() {
   unprintables[$(( unprintables[ctrl+w]=23 ))]=ctrl+w
   unprintables[$(( unprintables[backspace]=127 ))]=backspace
   # SOURCE_ALIAS 用于指定定义alias的文件
-  # TODO: 之后默认source ~/.bashrc 文件
   [[ -n $SOURCE_ALIAS ]] && . $SOURCE_ALIAS
   refresh_prompt
 }
