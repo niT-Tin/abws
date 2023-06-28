@@ -159,12 +159,14 @@ refresh_prompt() {
   # unset "dirs[-1]"
   last_dir="${dirs[$(( ${#dirs[@]} - 1 ))]}"
   unset "dirs[$(( ${#dirs[@]} - 1 ))]"
+  [[ "home" == "${dirs[1]}" && "$(user)" == "${dirs[2]}" ]] && homef=1
   for i in "${!dirs[@]}"; 
   do
     dirs[i]=${dirs[$i]:0:dlen}
   done
   # 默认最后一个文件夹名称完整输出
   APWD="$(IFS='/'; echo "${dirs[*]}")/$last_dir"
+  [[ $homef -eq 1 ]] && APWD="~${APWD:$((dlen * 2 + 2))}"
   uprompt=$DEFAULT_PROMPT$APWD"\e[0m\e[1;37m${picon}\e[0m\n\e[1;${ccolor}m╰─λ\e[0m "
 }
 
