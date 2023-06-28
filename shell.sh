@@ -159,7 +159,9 @@ refresh_prompt() {
   # unset "dirs[-1]"
   last_dir="${dirs[$(( ${#dirs[@]} - 1 ))]}"
   unset "dirs[$(( ${#dirs[@]} - 1 ))]"
-  [[ "home" == "${dirs[1]}" && "$(user)" == "${dirs[2]}" ]] && homef=1
+  [[ "${PWD#$HOME}" != "$PWD" ]] && homef=1
+  # Linux下主目录可以设置在别的目录下，不一定要在/home下
+  # [[ "home" == "${dirs[1]}" && "$(user)" == "${dirs[2]}" ]] && homef=1
   for i in "${!dirs[@]}"; 
   do
     dirs[i]=${dirs[$i]:0:dlen}
