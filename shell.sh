@@ -519,7 +519,9 @@ _comp_general() {
     cmd="${BASH_REMATCH[1]}"
   fi
   cmd=$(which "$cmd" 2>/dev/null)
-  [[ -n $cmd ]] && need_to_match="${BASH_REMATCH[3]}"
+  [[ -n $cmd ]] && { 
+    need_to_match="${BASH_REMATCH[3]}"
+    [[ "${BUFFER##*[[:blank:]]}" != "${BASH_REMATCH[3]}" ]] && need_to_match="${BUFFER##*[[:blank:]]}"; }
   [[ -z $cmd && ! -f "${BASH_REMATCH[1]}" && ! -d "${BASH_REMATCH[1]}" ]] && return
   [[ -z $cmd ]] && need_to_match="${BASH_REMATCH[1]}"
   completion_reply=( $(compgen -f -- "$need_to_match") )
@@ -532,13 +534,15 @@ _comp_general() {
     # 如果BUFFER已经被修改，则不需要再次修改
     local dir_sep="/"
     local reply="${completion_reply[0]}"
+    local expand_reply
+    expand_reply="$(eval /usr/bin/ls -d "$reply" 2>/dev/null)"
     local suffix="$need_to_match"
-    if [[ -f "$reply" || -d "$reply" ]]; then
+    if [[ -f "$expand_reply" || -d "$expand_reply" ]]; then
       local nshow=${reply#"$suffix"}
       local len=${#nshow}
       BUFFER="${BUFFER%"$suffix"}$reply"
       printf '%s' "$nshow"
-      if [[ -d "$reply" ]]; then
+      if [[ -d "$expand_reply" ]]; then
         BUFFER="$BUFFER$dir_sep"
         printf '%s' "/"
         (( CURSOR+=len+1 ))
@@ -552,7 +556,7 @@ _comp_general() {
   do
     # TODO: 排版输出
     [[ $(( i  % 3 )) -eq 0 ]] && echo
-    if [[ -d ${completion_reply[i]} ]]; then
+    if [[ -d "$(eval /usr/bin/ls -d "${completion_reply[i]}" 2>/dev/null)" ]]; then
       echo-ne "\e[1;${dcolor}m${completion_reply[i]}\e[0m/\t"
       continue
     fi
@@ -640,7 +644,7 @@ _comp_cd() {
 expand-or-complete() {
   local general_file_pattern='^\s*(\S+)(\s+)(\S*)'
   local cd_pattern='^\s*cd(\s+)(\S*)'
-  local general_dir_pattern="^\s*(\S+)(\s*)(\S*)"
+  local general_dir_pattern='^\s*(\S+)(\s*)(\S*)'
   [[ $BUFFER =~ $cd_pattern ]] && { invisible_semi_decorator '_comp_cd'; return; }
   [[ $BUFFER =~ $general_file_pattern ]] && { invisible_semi_decorator '_comp_general'; return; }
   [[ $BUFFER =~ $general_dir_pattern ]] && { invisible_semi_decorator '_comp_general'; return; }
